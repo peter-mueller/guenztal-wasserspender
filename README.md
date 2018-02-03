@@ -2,6 +2,11 @@
 
 ```
 cd app
+
+cd web 
+yarn install
+cd ..
+
 go run main.go
 ```
 
