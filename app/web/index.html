@@ -13,7 +13,9 @@
             --primary-text-color: #f1f1f1;
         }
 
-        #group {
+        #group, #toggle-disabled {
+            display: flex;
+            flex-direction: column;
             background-color: #424242;
             border-radius: 2px;
             @apply(--shadow-elevation-3dp);
@@ -48,7 +50,6 @@
         }
 
         paper-toggle-button {
-            display: block;
             padding: 32px;
         }
 
