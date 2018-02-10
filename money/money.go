@@ -1,8 +1,6 @@
 package money
 
-type Money struct {
-	Cents uint
-}
+type Money uint
 
 const (
 	Cent = 1

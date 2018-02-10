@@ -51,5 +51,4 @@ func (b *ValveResource) Update(w http.ResponseWriter, r *http.Request, params ht
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-
 }

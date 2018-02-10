@@ -43,7 +43,7 @@ func NewCoinAcceptor(payer Payer) *CoinAcceptor {
 			log.Println("start wait")
 			pin.WaitForEdge(-1)
 			log.Println("paying")
-			payer.Pay(money.Money{Cents: money.Cent * 10})
+			payer.Pay(money.Cent)
 		}
 	}();
 	return &CoinAcceptor{e: pin}

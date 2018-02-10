@@ -7,6 +7,11 @@ import (
 type (
 	Payer struct {
 		DurationAdder
+		PayLogger
+	}
+
+	PayLogger interface {
+		LogPay(money Money)
 	}
 
 	DurationAdder interface {
@@ -14,17 +19,20 @@ type (
 	}
 )
 
-func NewPayer(adder DurationAdder) *Payer {
+func NewPayer(adder DurationAdder, logger PayLogger) *Payer {
 	return &Payer{
 		DurationAdder: adder,
+		PayLogger: logger,
 	}
 }
 
 func (p *Payer) Pay(m Money) {
-	if m.Cents == 0 {
+	if m == 0 {
 		return
 	}
 
-	d := time.Duration(m.Cents) * time.Second
+	p.LogPay(m)
+
+	d := time.Duration(m) * time.Second
 	p.AddDuration(d)
 }

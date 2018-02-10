@@ -20,3 +20,11 @@ GET http://localhost:8080/api/v1/timer/
 
 ###
 
+
+GET http://localhost:8080/api/v1/accounting/?groupBy=monthly
+
+###
+
+GET http://localhost:8080/api/v1/accounting/
+
+###
