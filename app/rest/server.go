@@ -22,10 +22,10 @@ func NewServer(vc *control.Controller, timer *timer.Timer) *Server {
 	}
 }
 
-func (s Server) Start() {
+func (s Server) Start() error {
 	router := httprouter.New()
 	router.ServeFiles("/app/*filepath", http.Dir("web"))
 	router.PUT("/api/v1/buttons/:name", s.valves.Update)
 	router.GET("/api/v1/timer/", s.timer.Query)
-	http.ListenAndServe(":8080", router)
+	return http.ListenAndServe(":8080", router)
 }

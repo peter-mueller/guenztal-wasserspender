@@ -11,19 +11,27 @@ import (
 )
 
 var (
-	valves  = driver.NewValveStorage()
+
 
 	coinTimer = &timer.Timer{}
 	payer   = money.NewPayer(coinTimer)
 	roleProvider = role.NewProvider(coinTimer)
+
+	valves  = driver.NewValveStorage()
+	coinAcceptor = driver.NewCoinAcceptor(payer)
+
 	manager = control.NewController(valves, roleProvider)
+
 
 	server = rest.NewServer(manager, coinTimer)
 )
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	payer.Pay(money.Money{Cents:money.Euro})
 
-	payer.Pay(money.Money{money.Cent * 20})
-	server.Start()
+	err := server.Start()
+	if err != nil {
+		panic(err)
+	}
 }

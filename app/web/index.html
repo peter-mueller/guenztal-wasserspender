@@ -56,6 +56,11 @@
         paper-toggle-button {
             padding: 32px;
         }
+
+        paper-toast {
+            --paper-toast-background-color: #f1f1f1;
+            --paper-toast-color: #1f1f1f;
+        }
     </style>
 
 </head>
@@ -63,11 +68,11 @@
 
 
 <div id="group">
-    <paper-toggle-button id="cold">KALT</paper-toggle-button>
+    <paper-toggle-button id="cold">KALTES WASSER</paper-toggle-button>
 
     <div id="toggle-disabled">
-        <paper-toggle-button id="warm">WARM</paper-toggle-button>
-        <paper-toggle-button id="osmose">OSMOSE</paper-toggle-button>
+        <paper-toggle-button id="warm">WARMES WASSER</paper-toggle-button>
+        <paper-toggle-button id="osmose">OSMOSE WASSER</paper-toggle-button>
     </div>
 
     <spender-timer id="timer"></spender-timer>
@@ -160,7 +165,7 @@
 
     toggleDisabled.addEventListener('click', () => {
         if (osmose.disabled || warm.disabled ) {
-            toast.show("Bitte bezahlen");
+            toast.show("Bezahlen für Warmes und Osmose-Wasser");
         }
     });
 

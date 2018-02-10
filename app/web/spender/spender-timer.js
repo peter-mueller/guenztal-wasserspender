@@ -1,32 +1,45 @@
-import {Element} from '../node_modules/@polymer/polymer/polymer-element.js';
+import {html, LitElement} from '../node_modules/@polymer/lit-element/lit-element.js';
 
-export class SpenderTimer extends Element {
-
-    // Define a string template instead of a `<template>` element.
-    static get template() {
-        return ` 
-<style>
-    #time {
-        display: block;
-      text-align: center;
-    }
-</style>
-
-<div id="time">[[_formatTime(time)]]</div>`
-    }
-
+export class SpenderTimer extends LitElement {
     constructor() {
         super();
         this.time = new Date(0);
     }
 
-    // properties, observers, etc. are identical to 2.x
     static get properties() {
         return {
-            time: {
-                Type: Date
-            }
+            time: Date
         }
+    }
+
+    render({time}) {
+        return html`
+            <style>  
+                :host {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                
+                #coin {
+                  width: 68px;
+                  height: 68px;
+                  background-position: 0 0;
+                  transition: background-position 300ms steps(18,end);
+                }
+                
+                #coin.piggy {
+                  background-position: -1224px 0;
+                }
+
+                #time {
+                    display: block;
+                  text-align: center;
+                }
+            </style>
+            
+            <div id="coin" class$="${this.time.getTime() > 0 ? "piggy" : ""}" style="background-image: url(spender/sprite_60fps.svg)"></div>
+            <div id="time">${this._formatTime(time)}</div>`
     }
 
     _formatTime(time) {

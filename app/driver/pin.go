@@ -2,42 +2,72 @@
 
 package driver
 
-import(
-	"github.com/kidoman/embd"
-	_ "github.com/kidoman/embd/host/rpi"
+import (
+	"periph.io/x/periph/conn/gpio"
+	"periph.io/x/periph/host"
+	"periph.io/x/periph/host/rpi"
 	"github.com/peter-mueller/guenztal-wasserspender/valve"
+	"github.com/peter-mueller/guenztal-wasserspender/money"
+	"log"
 )
+
 type (
 	Pin struct {
 		Number uint
+		e      gpio.PinOut
+	}
+
+	CoinAcceptor struct {
+		e gpio.PinIn
+	}
+
+	Payer interface {
+		Pay(Money money.Money)
 	}
 )
+
 func init() {
-	err := embd.InitGPIO()
+	_, err := host.Init()
 	if err != nil {
 		panic(err)
 	}
+}
+
+func NewCoinAcceptor(payer Payer) *CoinAcceptor {
+
+	pin := rpi.P1_38
+	pin.In(gpio.PullUp, gpio.FallingEdge)
+
+	go func() {
+		for {
+			log.Println("start wait")
+			pin.WaitForEdge(-1)
+			log.Println("paying")
+			payer.Pay(money.Money{Cents: money.Cent * 10})
+		}
+	}();
+	return &CoinAcceptor{e: pin}
 }
 
 func NewValveStorage() *valve.Storage {
-	return &ValveFactory{
-		Cold: valve.NewValve("cold", NewPin(1)),
-		Warm: valve.NewValve("warm", NewPin(1)),
-		Osmose: valve.NewValve("osmose", NewPin(1)),
+	return &valve.Storage{
+		Cold:   valve.NewValve("cold", NewPin(rpi.P1_35)),
+		Warm:   valve.NewValve("warm", NewPin(rpi.P1_36)),
+		Osmose: valve.NewValve("osmose", NewPin(rpi.P1_37)),
 	}
 }
 
-func NewPin(pin uint) Pin {
-	err := embd.SetDirection(pin, embd.Out)
+func NewPin(pin gpio.PinOut) Pin {
+	err := pin.Out(gpio.Low)
 	if err != nil {
 		panic(err)
 	}
-	return Pin{Number: pin}
+	return Pin{e: pin}
 }
 func (p Pin) HIGH() error {
-	return embd.DigitalWrite(p.Number, embd.High)
+	return p.e.Out(gpio.High)
 }
 
 func (p Pin) LOW() error {
-	return embd.DigitalWrite(p.Number, embd.Low)
+	return p.e.Out(gpio.Low)
 }
