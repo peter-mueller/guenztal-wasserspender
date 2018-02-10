@@ -12,6 +12,19 @@ export class SpenderTimer extends LitElement {
         }
     }
 
+    blink() {
+        this.shadowRoot.getElementById('coin').animate(
+            [
+                {transform: "scale(1)"},
+                {transform: "scale(1.1)"},
+                {transform: "scale(1)"},
+            ],
+            {
+                duration: 300,
+            }
+        )
+    }
+
     render({time}) {
         return html`
             <style>  

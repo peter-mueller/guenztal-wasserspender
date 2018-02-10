@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <title>Title</title>
 
-    <script type="module" src="spender/spender-timer.js"></script>
-    <script type="module" src="node_modules/@polymer/paper-toggle-button/paper-toggle-button.js"></script>
-    <script type="module" src="node_modules/@polymer/paper-toast/paper-toast.js"></script>
-    <script type="module" src="node_modules/@polymer/paper-styles/color.js"></script>
-    <script type="module" src="node_modules/@polymer/paper-styles/shadow.js"></script>
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,6 +48,7 @@
         }
 
         paper-toggle-button {
+            display: block;
             padding: 32px;
         }
 
@@ -63,6 +58,14 @@
         }
     </style>
 
+
+
+    <script type="module" src="spender/spender-timer.js"></script>
+    <script type="module" src="node_modules/@polymer/paper-toggle-button/paper-toggle-button.js"></script>
+    <script type="module" src="node_modules/@polymer/paper-toast/paper-toast.js"></script>
+    <script type="module" src="node_modules/@polymer/paper-styles/color.js"></script>
+    <script type="module" src="node_modules/@polymer/paper-styles/shadow.js"></script>
+
 </head>
 <body>
 
@@ -71,8 +74,8 @@
     <paper-toggle-button id="cold">KALTES WASSER</paper-toggle-button>
 
     <div id="toggle-disabled">
-        <paper-toggle-button id="warm">WARMES WASSER</paper-toggle-button>
-        <paper-toggle-button id="osmose">OSMOSE WASSER</paper-toggle-button>
+        <paper-toggle-button disabled id="warm">WARMES WASSER</paper-toggle-button>
+        <paper-toggle-button disabled id="osmose">OSMOSE WASSER</paper-toggle-button>
     </div>
 
     <spender-timer id="timer"></spender-timer>
@@ -166,6 +169,7 @@
     toggleDisabled.addEventListener('click', () => {
         if (osmose.disabled || warm.disabled ) {
             toast.show("Bezahlen für Warmes und Osmose-Wasser");
+            timer.blink();
         }
     });
 
