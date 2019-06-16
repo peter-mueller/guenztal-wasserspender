@@ -3,12 +3,13 @@
 package driver
 
 import (
+	"log"
+
+	"github.com/peter-mueller/guenztal-wasserspender/money"
+	"github.com/peter-mueller/guenztal-wasserspender/valve"
 	"periph.io/x/periph/conn/gpio"
 	"periph.io/x/periph/host"
 	"periph.io/x/periph/host/rpi"
-	"github.com/peter-mueller/guenztal-wasserspender/valve"
-	"github.com/peter-mueller/guenztal-wasserspender/money"
-	"log"
 )
 
 type (
@@ -35,6 +36,9 @@ func init() {
 
 func NewCoinAcceptor(payer Payer) *CoinAcceptor {
 
+	// INHIBIT PIN to enable coin acceptor
+	rpi.P1_40.Out(gpio.High)
+
 	pin := rpi.P1_38
 	pin.In(gpio.PullUp, gpio.FallingEdge)
 
@@ -45,7 +49,7 @@ func NewCoinAcceptor(payer Payer) *CoinAcceptor {
 			log.Println("paying")
 			payer.Pay(money.Cent)
 		}
-	}();
+	}()
 	return &CoinAcceptor{e: pin}
 }
 
