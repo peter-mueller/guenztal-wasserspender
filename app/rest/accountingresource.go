@@ -1,11 +1,12 @@
 package rest
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"github.com/peter-mueller/guenztal-wasserspender/money"
-	"net/http"
 	"encoding/json"
 	"log"
+	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/peter-mueller/guenztal-wasserspender/money"
 )
 
 type (
@@ -25,7 +26,7 @@ func NewAccountingResource(logger PayLogger) *AccountingResource {
 }
 
 func (b *AccountingResource) Query(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	monthly := 	r.FormValue("groupBy")
+	monthly := r.FormValue("groupBy")
 	log.Println(monthly)
 
 	switch monthly {

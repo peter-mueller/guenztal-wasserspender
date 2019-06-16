@@ -1,11 +1,12 @@
 package rest
 
 import (
-	"github.com/peter-mueller/guenztal-wasserspender/timer"
-	"github.com/julienschmidt/httprouter"
-	"net/http"
 	"encoding/json"
+	"net/http"
 	"time"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/peter-mueller/guenztal-wasserspender/timer"
 )
 
 type (

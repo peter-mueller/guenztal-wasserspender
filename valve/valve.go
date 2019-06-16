@@ -7,16 +7,17 @@ import (
 
 type (
 	Valve struct {
-		Name string
+		Name         string
 		OpenDuration time.Duration
+		Opened       bool
 
 		output Output
-		timer *time.Timer
+		timer  *time.Timer
 	}
 
 	Storage struct {
-		Warm Valve
-		Cold Valve
+		Warm   Valve
+		Cold   Valve
 		Osmose Valve
 	}
 
@@ -34,27 +35,34 @@ func NewValve(name string, output Output) Valve {
 	return Valve{output: output, Name: name, OpenDuration: defaultOpenTime}
 }
 
-func (v* Valve) Open() error {
-	if v.timer != nil  {
+func (v *Valve) Open() error {
+	if v.timer != nil {
 		v.timer.Stop()
 	}
 
-	v.timer = time.AfterFunc(v.OpenDuration, func () {
+	v.timer = time.AfterFunc(v.OpenDuration, func() {
 		err := v.Close()
 		if err != nil {
 			log.Println(err)
 		}
 	})
-
+	err := v.output.HIGH()
+	if err != nil {
+		v.Opened = false
+		return err
+	}
 	log.Printf("Openened Valve %s", v.Name)
-	return v.output.HIGH()
+	v.Opened = true
+	return nil
 }
 
-func (v* Valve) Close() error {
-	if v.timer != nil  {
+func (v *Valve) Close() error {
+	if v.timer != nil {
 		v.timer.Stop()
 	}
 
 	log.Printf("Closed Valve %s", v.Name)
-	return v.output.LOW()
+	err := v.output.LOW()
+	v.Opened = false
+	return err
 }

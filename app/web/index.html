@@ -1,182 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<!--
+@license
+Copyright (c) 2018 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><!DOCTYPE html><html lang="en"><head>
+  <meta charset="utf-8">
+  <title>Günztal Wasserspender</title>
+  <meta name="generator" content="Günztal Wasserspender">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Control Panel für die Wasserausgabe am Günztal Waschpark">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: larger;
-            background-color: #303030;
-            color: #f1f1f1;
-            --primary-text-color: #f1f1f1;
-            user-select: none;
-        }
+  <!--
+      The `<base>` tag below is present to support two advanced deployment options:
+      1) Differential serving. 2) Serving from a non-root path.
 
-        #group, #toggle-disabled {
-            display: flex;
-            flex-direction: column;
-            background-color: #424242;
-            border-radius: 2px;
-            @apply(--shadow-elevation-3dp);
-        }
+      Instead of manually editing the `<base>` tag yourself, you should generally either:
+      a) Add a `basePath` property to the build configuration in your `polymer.json`.
+      b) Use the `--base-path` command-line option for `polymer build`.
+    -->
+  <base href="/">
 
-        paper-toggle-button {
-            font-weight: bold;
-            transition: background-color 100ms ease-in;
-        }
+  <link rel="icon" href="images/favicon.ico">
 
-        #cold[disabled], #warm[disabled], #osmose[disabled] {
-            background-color: #424242;
-        }
+  <!-- See https://goo.gl/OOhYW5 -->
+  <link rel="manifest" href="manifest.json">
 
-        #cold {
-            --primary-color: var(--paper-indigo-a100);
-            background-color: var(--paper-indigo-500);
-        }
+  <!-- See https://goo.gl/qRE0vM -->
+  <meta name="theme-color" content="#3f51b5">
 
-        #warm {
-            --primary-color: var(--paper-orange-a100);
-            background-color: var(--paper-orange-500);
-        }
-
-        #osmose {
-
-            --primary-color: var(--paper-green-a100);
-            background-color: var(--paper-green-500);
-        }
-
-        #timer {
-            padding: 32px;
-        }
-
-        paper-toggle-button {
-            padding: 32px;
-        }
-
-        paper-toast {
-            --paper-toast-background-color: #f1f1f1;
-            --paper-toast-color: #1f1f1f;
-        }
-    </style>
+  <!-- Add to homescreen for Chrome on Android. Fallback for manifest.json -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="My App">
 
 
 
-    <script type="module" src="spender/spender-timer.js"></script>
-    <script type="module" src="node_modules/@polymer/paper-toggle-button/paper-toggle-button.js"></script>
-    <script type="module" src="node_modules/@polymer/paper-toast/paper-toast.js"></script>
-    <script type="module" src="node_modules/@polymer/paper-styles/color.js"></script>
-    <script type="module" src="node_modules/@polymer/paper-styles/shadow.js"></script>
+  <!-- Performance tip: hint to the browser to start the handshake for the fonts site -->
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <script>// Load and register pre-caching Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('service-worker.js', {
+      scope: '/'
+    });
+  });
+}</script>
 
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab&amp;display=swap" rel="stylesheet">
+
+
+  <!-- Add any global styles for body, document, etc. -->
+  <style>
+    body {
+      margin: 0;
+      /* This is a font-stack that tries to use the system-default sans-serifs first */
+      font-family: Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+
+      background-color: #efefef;
+
+      /* Background pattern from Toptal Subtle Patterns */
+
+    }
+  </style>
 </head>
+
 <body>
+  <my-app apptitle="Günztal Wasserspender"></my-app>
+  <noscript>
+    Please enable JavaScript to view this website.
+  </noscript>
+  <!-- Load webcomponents-loader.js to check and load any polyfills your browser needs -->
+  <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+  <!-- Built with love using Günztal Wasserspender -->
+  <script type="module" src="src/components/my-app.js"></script>
 
 
-<div id="group">
-    <paper-toggle-button id="cold">KALTES WASSER</paper-toggle-button>
-
-    <div id="toggle-disabled">
-        <paper-toggle-button disabled id="warm">WARMES WASSER</paper-toggle-button>
-        <paper-toggle-button disabled id="osmose">OSMOSE WASSER</paper-toggle-button>
-    </div>
-
-    <spender-timer id="timer"></spender-timer>
-</div>
-
-<paper-toast id="toast"></paper-toast>
-
-<script type="module">
-    const refreshInterval = 500;
-    const openTime = 10000;
-
-    const timer = document.getElementById("timer");
-    const cold = document.getElementById("cold");
-    const warm = document.getElementById("warm");
-    const osmose = document.getElementById("osmose");
-
-    const toggleDisabled = document.getElementById("toggle-disabled");
-    const toast = document.getElementById("toast");
-
-    window.setInterval(() => {
-        fetch('/api/v1/timer/')
-                .then(res => res.json())
-                .then(data => {
-                    let time = new Date(new Date(data.End) - new Date());
-
-                    cold.disabled = false;
-                    if (time < 0) {
-                        warm.disabled = true;
-                        osmose.disabled = true;
-                        time = new Date(0);
-                    } else {
-                        warm.disabled = false;
-                        osmose.disabled = false;
-                    }
-                    timer.time = time;
-                })
-                .catch(() => {
-                    timer.time = new Date(0);
-                    cold.disabled = true;
-                    warm.disabled = true;
-                    osmose.disabled = true;
-                    toast.show("⚠ Störung");
-                });
-    }, refreshInterval);
-
-    cold.addEventListener('checked-changed', e => {
-        const checked = e.detail.value;
-        if (cold.timeout) {
-            clearTimeout(cold.timeout);
-        }
-        if (checked) {
-            cold.timeout = setTimeout(() => cold.checked = false, openTime);
-        }
-
-        fetch('/api/v1/buttons/cold', {
-            method: 'put',
-            body: JSON.stringify({Open: checked})
-        }).catch(() => cold.checked = false);
-    });
-
-    warm.addEventListener('checked-changed', e => {
-        const checked = e.detail.value;
-        if (warm.timeout) {
-            clearTimeout(warm.timeout);
-        }
-        if (checked) {
-            warm.timeout = setTimeout(() => warm.checked = false, openTime);
-        }
-
-        fetch('/api/v1/buttons/warm', {
-            method: 'put',
-            body: JSON.stringify({Open: checked})
-        }).catch(() => warm.checked = false);
-    });
-
-    osmose.addEventListener('checked-changed', e => {
-        const checked = e.detail.value;
-        if (osmose.timeout) {
-            clearTimeout(osmose.timeout);
-        }
-        if (checked) {
-            osmose.timeout = setTimeout(() => osmose.checked = false, openTime);
-        }
-
-        fetch('/api/v1/buttons/osmose', {
-            method: 'put',
-            body: JSON.stringify({Open: checked})
-        }).catch(() => osmose.checked = false);
-    });
-
-    toggleDisabled.addEventListener('click', () => {
-        if (osmose.disabled || warm.disabled ) {
-            toast.show("Bezahlen für Warmes und Osmose-Wasser");
-            timer.blink();
-        }
-    });
-
-</script>
-
-</body>
-</html>
+</body></html>

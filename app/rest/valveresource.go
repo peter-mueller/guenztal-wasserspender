@@ -1,8 +1,9 @@
 package rest
 
 import (
-	"net/http"
 	"encoding/json"
+	"net/http"
+
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/peter-mueller/guenztal-wasserspender/valve/control"
@@ -21,6 +22,14 @@ type (
 func NewValveResource(vc *control.Controller) *ValveResource {
 	return &ValveResource{
 		vc: vc,
+	}
+}
+
+func (b *ValveResource) FindAll(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	err := json.NewEncoder(w).Encode(b.vc.Valves)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
 

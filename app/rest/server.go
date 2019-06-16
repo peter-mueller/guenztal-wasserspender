@@ -1,17 +1,19 @@
 package rest
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"net/http"
-	"github.com/peter-mueller/guenztal-wasserspender/valve/control"
+
+	"github.com/gorilla/handlers"
+	"github.com/julienschmidt/httprouter"
 	"github.com/peter-mueller/guenztal-wasserspender/timer"
+	"github.com/peter-mueller/guenztal-wasserspender/valve/control"
 )
 
 type (
 	Server struct {
 		valves *ValveResource
-		timer *TimerResource
-		money *AccountingResource
+		timer  *TimerResource
+		money  *AccountingResource
 	}
 )
 
@@ -26,9 +28,16 @@ func NewServer(vc *control.Controller, timer *timer.Timer, logger PayLogger) *Se
 
 func (s Server) Start() error {
 	router := httprouter.New()
-	router.ServeFiles("/app/*filepath", http.Dir("web"))
-	router.PUT("/api/v1/buttons/:name", s.valves.Update)
+	router.PUT("/api/v1/valves/:name", s.valves.Update)
+	router.GET("/api/v1/valves/", s.valves.FindAll)
 	router.GET("/api/v1/timer/", s.timer.Query)
 	router.GET("/api/v1/accounting/", s.money.Query)
-	return http.ListenAndServe(":8080", router)
+
+	router.NotFound = http.FileServer(http.Dir("web"))
+
+	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+
+	return http.ListenAndServe(":8080", handlers.CORS(headersOk, originsOk, methodsOk)(router))
 }
