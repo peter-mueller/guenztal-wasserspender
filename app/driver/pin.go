@@ -4,6 +4,7 @@ package driver
 
 import (
 	"log"
+	"time"
 
 	"github.com/peter-mueller/guenztal-wasserspender/money"
 	"github.com/peter-mueller/guenztal-wasserspender/valve"
@@ -47,18 +48,22 @@ func NewCoinAcceptor(payer Payer) *CoinAcceptor {
 			log.Println("start wait")
 			pin.WaitForEdge(-1)
 			log.Println("paying")
-			payer.Pay(money.Cent)
+			payer.Pay(money.Cent * 10)
 		}
 	}()
 	return &CoinAcceptor{e: pin}
 }
 
 func NewValveStorage() *valve.Storage {
-	return &valve.Storage{
+	m := &valve.Storage{
 		Cold:   valve.NewValve("cold", NewPin(rpi.P1_35)),
 		Warm:   valve.NewValve("warm", NewPin(rpi.P1_36)),
 		Osmose: valve.NewValve("osmose", NewPin(rpi.P1_37)),
 	}
+
+	m.Warm.OpenDuration = time.Minute * 20
+	m.Osmose.OpenDuration = time.Minute * 20
+	return m
 }
 
 func NewPin(pin gpio.PinOut) Pin {

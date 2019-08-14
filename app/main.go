@@ -1,34 +1,36 @@
 package main
 
 import (
-	"github.com/peter-mueller/guenztal-wasserspender/app/driver"
-	"github.com/peter-mueller/guenztal-wasserspender/timer"
 	"log"
+
+	"github.com/peter-mueller/guenztal-wasserspender/app/driver"
+	"github.com/peter-mueller/guenztal-wasserspender/app/rest"
 	"github.com/peter-mueller/guenztal-wasserspender/money"
 	moneyDriver "github.com/peter-mueller/guenztal-wasserspender/money/driver"
-	"github.com/peter-mueller/guenztal-wasserspender/app/rest"
-	"github.com/peter-mueller/guenztal-wasserspender/valve/control"
 	"github.com/peter-mueller/guenztal-wasserspender/role"
+	"github.com/peter-mueller/guenztal-wasserspender/timer"
+	"github.com/peter-mueller/guenztal-wasserspender/valve/control"
 )
 
 var (
+	valves = driver.NewValveStorage()
 
+	coinTimer = &timer.Timer{
+		OnEnd: func() {
+			valves.Osmose.Close()
+			valves.Warm.Close()
+		},
+	}
 
-	coinTimer = &timer.Timer{}
-
-
-	payLog = moneyDriver.NewFilePayLog()
-	payer   = money.NewPayer(coinTimer, payLog)
+	payLog       = moneyDriver.NewFilePayLog()
+	payer        = money.NewPayer(coinTimer, payLog)
 	roleProvider = role.NewProvider(coinTimer)
 
-	valves  = driver.NewValveStorage()
 	coinAcceptor = driver.NewCoinAcceptor(payer)
 
 	manager = control.NewController(valves, roleProvider)
 
-
-
-	server = rest.NewServer(manager, coinTimer,payLog)
+	server = rest.NewServer(manager, coinTimer, payLog)
 )
 
 func main() {

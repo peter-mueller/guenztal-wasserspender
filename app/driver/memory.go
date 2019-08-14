@@ -3,8 +3,10 @@
 package driver
 
 import (
-	"github.com/peter-mueller/guenztal-wasserspender/valve"
+	"time"
+
 	"github.com/peter-mueller/guenztal-wasserspender/money"
+	"github.com/peter-mueller/guenztal-wasserspender/valve"
 )
 
 type (
@@ -25,11 +27,15 @@ func NewCoinAcceptor(payer Payer) *CoinAcceptor {
 }
 
 func NewValveStorage() *valve.Storage {
-	return &valve.Storage{
+	m := &valve.Storage{
 		Cold:   valve.NewValve("cold", Memory{}),
 		Warm:   valve.NewValve("warm", Memory{}),
 		Osmose: valve.NewValve("osmose", Memory{}),
 	}
+
+	m.Warm.OpenDuration = time.Minute * 20
+	m.Osmose.OpenDuration = time.Minute * 20
+	return m
 }
 
 func (m Memory) HIGH() error {
