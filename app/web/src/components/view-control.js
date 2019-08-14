@@ -70,6 +70,7 @@ class ViewControl extends PageViewElement {
 
       water-toggle {
         padding: 8px;
+        width: 100%;
       }
 
       json-table {

@@ -28,33 +28,40 @@ class WaterToggle extends LitElement {
     return [sharedStyles, css`
             .card {
                 background-color: white;   
-                border-radius: 4px;   
+                border-radius: 4px;  
+                
+                display: flex;
+                flex-direction: row;
+                align-items: center;
 
-                overflow: hidden;
-                width: 256px;
 
                 box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
             }
 
             .card img {
+              display: flex;
                 object-fit: cover;
-                height: 194px;
-                width: 100%;
+                width: 178px;
+                height: 64px;
                 transition: filter 1s;
             }
             .card img[locked] {
                 filter: grayscale(71%);
             }
-            .card section {
+            .card section[label] {
                 padding: 16px;
+                                flex-grow: 1;
+
             }
 
             .card section[actions] {
                 padding: 8px;
-                display: flex;
-                flex-direction: row-reverse;
-                align-items: center;
             }
+
+            #label {
+                font-size: 1em;
+            }
+
         `];
   }
 
@@ -67,10 +74,12 @@ class WaterToggle extends LitElement {
   render() {
     return html`
         <div class="card">
-            <img src=${this.imageSrc} ?locked=${this.locked}>
 
-            <section>
-    <div class="mdc-typography--overline">${this.label}</div>
+        <div>
+            <img src=${this.imageSrc} ?locked=${this.locked}>
+        </div>
+            <section label>
+    <div id="label" class="mdc-typography--overline">${this.label}</div>
             </section>
 
             <section actions>
@@ -86,7 +95,7 @@ class WaterToggle extends LitElement {
                 ></mwc-button>
 
             </section>
-    
+
         </div>
 
         `;
